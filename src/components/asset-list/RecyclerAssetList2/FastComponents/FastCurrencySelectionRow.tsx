@@ -41,6 +41,10 @@ export default React.memo(function FastCurrencySelectionRow({
           </Text>
         </View>
       </View>
+      <View style={[cx.fav]}>
+        <Text>􀋃</Text>
+        <Text>􀅼</Text>
+      </View>
     </View>
   );
 });
@@ -48,6 +52,9 @@ export default React.memo(function FastCurrencySelectionRow({
 const cx = StyleSheet.create({
   bottom: {
     marginTop: 12,
+  },
+  center: {
+    justifyContent: 'center',
   },
   checkboxContainer: {
     width: 51,
@@ -66,9 +73,6 @@ const cx = StyleSheet.create({
     backgroundColor: colors.appleBlue,
     left: 19,
     position: 'absolute',
-  },
-  center: {
-    justifyContent: 'center',
   },
   circleOutline: {
     ...borders.buildCircleAsObject(22),
@@ -95,6 +99,12 @@ const cx = StyleSheet.create({
     marginLeft: 2,
     marginRight: 19,
     marginVertical: 9.5,
+  },
+  fav: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: 50,
   },
   flex: {
     flex: 1,
