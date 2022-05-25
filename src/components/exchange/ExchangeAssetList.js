@@ -8,9 +8,10 @@ import React, {
   useImperativeHandle,
   useRef,
 } from 'react';
-import { Alert, Keyboard, SectionList } from 'react-native';
+import { Alert, Keyboard, SectionList, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { ButtonPressAnimation } from '../../components/animations';
+import FastCurrencySelectionRow from "../asset-list/RecyclerAssetList2/FastComponents/FastCurrencySelectionRow";
 import { CoinRowHeight, ExchangeCoinRow } from '../coin-row';
 import { ContactRow } from '../contacts';
 import DiscoverSheetContext from '../discover-sheet/DiscoverSheetContext';
@@ -93,20 +94,26 @@ const Spacer = styled.View({
 });
 
 const ExchangeAssetSectionList = styled(SectionList).attrs({
-  alwaysBounceVertical: true,
-  contentContainerStyle,
-  directionalLockEnabled: true,
+  // alwaysBounceVertical: true,
+  // contentContainerStyle,
+  // directionalLockEnabled: true,
   getItemLayout,
-  initialNumToRender: 10,
-  keyboardShouldPersistTaps: 'always',
-  keyExtractor,
-  maxToRenderPerBatch: 50,
-  scrollEventThrottle: 32,
-  scrollIndicatorInsets,
-  windowSize: 41,
+  // initialNumToRender: 10,
+  // keyboardShouldPersistTaps: 'always',
+  // keyExtractor,
+  // scrollIndicatorInsets,
+  windowSize: 7,
 })({
   height: '100%',
 });
+
+function renderItem({ item }) {
+  return (
+    <FastCurrencySelectionRow
+      item={item}
+    />
+  );
+}
 
 const ExchangeAssetList = (
   {
@@ -222,13 +229,14 @@ const ExchangeAssetList = (
     [onCopySwapDetailsText]
   );
   const renderItemCallback = useCallback(
-    ({ item, index, section }) => (
-      // in the Discover screen search results, we mix in ENS rows with coin rows
-      <LineToRender
-        item={item}
-        key={`${item.address}_${index}_${section.key}`}
-      />
-    ),
+    ({ item, index, section }) =>
+      console.log(item.name) || (
+        // in the Discover screen search results, we mix in ENS rows with coin rows
+        <LineToRender
+          item={item}
+          key={`${item.address}_${index}_${section.key}`}
+        />
+      ),
     []
   );
 
@@ -242,16 +250,19 @@ const ExchangeAssetList = (
 
   return (
     <Fragment>
-      <ExchangeAssetSectionList
-        ListFooterComponent={FooterSpacer}
-        keyboardDismissMode={keyboardDismissMode}
-        onLayout={onLayout}
-        ref={sectionListRef}
-        renderItem={renderItemCallback}
-        renderSectionHeader={ExchangeAssetSectionListHeader}
-        scrollsToTop={isFocused}
-        sections={sections}
-      />
+      <View style={{ height: '100%', width: '100%' }}>
+        <ExchangeAssetSectionList
+          ListFooterComponent={FooterSpacer}
+          keyboardDismissMode={keyboardDismissMode}
+          onLayout={onLayout}
+          ref={sectionListRef}
+          renderItem={renderItem}
+          renderSectionHeader={ExchangeAssetSectionListHeader}
+          scrollsToTop={isFocused}
+          sections={sections}
+        />
+      </View>
+
       <ToastPositionContainer>
         <CopyToast copiedText={copiedText} copyCount={copyCount} />
       </ToastPositionContainer>
