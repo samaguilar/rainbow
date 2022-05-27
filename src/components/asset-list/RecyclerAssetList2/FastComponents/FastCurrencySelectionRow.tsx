@@ -1,50 +1,141 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { IS_TESTING } from 'react-native-dotenv';
+import { BaseButton } from 'react-native-gesture-handler';
+import RadialGradient from 'react-native-radial-gradient';
 import useAccountSettings from '../../../../hooks/useAccountSettings';
+import { ButtonPressAnimation } from '../../../animations';
 import { CoinRowHeight } from '../../../coin-row';
 import FastCoinIcon from './FastCoinIcon';
 import { useTheme } from '@rainbow-me/context';
 import { Text } from '@rainbow-me/design-system';
 import { useAccountAsset } from '@rainbow-me/hooks';
+import styled from '@rainbow-me/styled-components';
 import { borders, colors, padding } from '@rainbow-me/styles';
 
+const Circle = styled(
+  IS_TESTING === 'true' ? RadialGradient : RadialGradient
+).attrs(({ isFavorited, theme: { colors, isDarkMode } }) => ({
+  center: [0, 15],
+  colors: isFavorited
+    ? [
+        colors.alpha('#FFB200', isDarkMode ? 0.15 : 0),
+        colors.alpha('#FFB200', isDarkMode ? 0.05 : 0.2),
+      ]
+    : colors.gradients.lightestGrey,
+}))({
+  borderRadius: 15,
+  height: 30,
+  overflow: 'hidden',
+  width: 30,
+});
+
 export default React.memo(function FastCurrencySelectionRow({
-  item: { uniqueId },
+  item: { uniqueId, showBalance, showFavoriteButton, onPress, theme, nativeCurrency, nativeCurrencySymbol, favorite, toggleFavorite },
 }: {
   item: any;
 }) {
   // TODO
-  const theme = useTheme();
-  const { nativeCurrency, nativeCurrencySymbol } = useAccountSettings();
+  const { isDarkMode } = theme;
+
 
   const item = useAccountAsset(uniqueId, nativeCurrency);
 
+
+  if (!item) {
+    return null
+  }
+
+  console.log({ favorite })
   return (
-    <View style={[cx.rootContainer, cx.nonEditMode]}>
-      <FastCoinIcon
-        address={item.mainnet_address || item.address}
-        symbol={item.symbol}
-        theme={theme}
-      />
-      <View style={[cx.innerContainer]}>
-        <View style={[cx.column, cx.center]}>
-          <Text align="right" numberOfLines={1} size="16px" weight="medium">
-            {item.name}
-          </Text>
+    <View style={{ flexDirection: 'row', width: '100%' }}>
+      <ButtonPressAnimation
+        onPress={onPress}
+        wrapperStyle={{
+          flex: 1,
+        }}
+      >
+        <View style={[cx.rootContainer, { flex: 1, width: '100%' }]}>
+          <FastCoinIcon
+            address={item.mainnet_address || item.address}
+            symbol={item.symbol}
+            theme={theme}
+          />
+          <View style={[cx.innerContainer, { backgroundColor: 'blue' }]}>
+            <View style={[cx.column, cx.center]}>
+              <Text align="left" numberOfLines={1} size="16px" weight="medium">
+                {item.name}
+              </Text>
+              <Text
+                align="left"
+                color={{ custom: theme.colors.blueGreyDark50 }}
+                numberOfLines={1}
+                size="12px"
+                weight="medium"
+              >
+                {item.symbol}
+              </Text>
+            </View>
+            {showBalance && (
+              <View style={[cx.column]}>
+                <Text align="right" size="12px" weight="medium">
+                  {item?.native?.balance?.display ??
+                    `${nativeCurrencySymbol}0.00`}
+                </Text>
+                <Text
+                  color={{ custom: theme.colors.blueGreyDark50 }}
+                  size="14px"
+                >
+                  {item?.balance?.display ?? ''}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
-        <View style={[cx.column]}>
-          <Text align="right" size="12px" weight="medium">
-            {item?.native?.balance?.display ?? `${nativeCurrencySymbol}0.00`}
-          </Text>
-          <Text color={{ custom: theme.colors.blueGreyDark50 }} size="14px">
-            {item?.balance?.display ?? ''}
-          </Text>
+      </ButtonPressAnimation>
+      {showFavoriteButton && (
+        <View style={[cx.fav]}>
+          <ButtonPressAnimation
+            onPress={toggleFavorite}
+          >
+            <RadialGradient
+              center={[0, 15]}
+              colors={[
+                colors.alpha('#FFB200', isDarkMode ? 0.15 : 0),
+                colors.alpha('#FFB200', isDarkMode ? 0.05 : 0.2),
+              ]}
+              style={{
+                alignItems: 'center',
+                borderRadius: 15,
+                height: 30,
+                justifyContent: 'center',
+                overflow: 'hidden',
+                paddingBottom: 5,
+                width: 30,
+              }}
+            >
+              {favorite && <Text color={{ custom: colors.yellowFavorite }}>􀋃</Text>}
+            </RadialGradient>
+          </ButtonPressAnimation>
+          <ButtonPressAnimation>
+            <RadialGradient
+              center={[0, 15]}
+              colors={colors.gradients.lightestGrey}
+              style={{
+                alignItems: 'center',
+                borderRadius: 15,
+                height: 30,
+                justifyContent: 'center',
+                overflow: 'hidden',
+                paddingBottom: 3,
+                width: 30,
+              }}
+            >
+              <Text>􀅼</Text>
+            </RadialGradient>
+          </ButtonPressAnimation>
         </View>
-      </View>
-      <View style={[cx.fav]}>
-        <Text>􀋃</Text>
-        <Text>􀅼</Text>
-      </View>
+      )}
     </View>
   );
 });
@@ -104,7 +195,8 @@ const cx = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: 50,
+    paddingRight: 20,
+    width: 80,
   },
   flex: {
     flex: 1,
@@ -119,12 +211,13 @@ const cx = StyleSheet.create({
     marginLeft: 10,
   },
   nonEditMode: {
-    paddingLeft: 19,
+    paddingHorizontal: 19,
   },
   rootContainer: {
     alignItems: 'center',
     flex: 1,
     flexDirection: 'row',
     height: CoinRowHeight,
+    paddingHorizontal: 19,
   },
 });

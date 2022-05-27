@@ -10,16 +10,21 @@ import React, {
 } from 'react';
 import { Alert, Keyboard, SectionList, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { useDispatch, useSelector } from 'react-redux';
 import { ButtonPressAnimation } from '../../components/animations';
-import FastCurrencySelectionRow from "../asset-list/RecyclerAssetList2/FastComponents/FastCurrencySelectionRow";
+import { accountAssetsDataSelector } from '../../hooks/useAccountAsset';
+import useAccountSettings from '../../hooks/useAccountSettings';
+import FastCurrencySelectionRow from '../asset-list/RecyclerAssetList2/FastComponents/FastCurrencySelectionRow';
 import { CoinRowHeight, ExchangeCoinRow } from '../coin-row';
 import { ContactRow } from '../contacts';
 import DiscoverSheetContext from '../discover-sheet/DiscoverSheetContext';
 import { GradientText, Text } from '../text';
 import { CopyToast, ToastPositionContainer } from '../toasts';
+import { useTheme } from '@rainbow-me/context';
 import { TokenSectionTypes } from '@rainbow-me/helpers';
-import { usePrevious } from '@rainbow-me/hooks';
+import { usePrevious, useUniswapCurrencyList } from '@rainbow-me/hooks';
 import { useNavigation } from '@rainbow-me/navigation';
+import { uniswapUpdateFavorites } from '@rainbow-me/redux/uniswap';
 import Routes from '@rainbow-me/routes';
 import styled from '@rainbow-me/styled-components';
 import { padding } from '@rainbow-me/styles';
@@ -108,11 +113,7 @@ const ExchangeAssetSectionList = styled(SectionList).attrs({
 });
 
 function renderItem({ item }) {
-  return (
-    <FastCurrencySelectionRow
-      item={item}
-    />
-  );
+  return <FastCurrencySelectionRow item={item} />;
 }
 
 const ExchangeAssetList = (
@@ -152,6 +153,8 @@ const ExchangeAssetList = (
   const createItem = useCallback(item => Object.assign(item, itemProps), [
     itemProps,
   ]);
+
+  const dispatch = useDispatch();
 
   const handleUnverifiedTokenPress = useCallback(
     item => {
@@ -244,9 +247,46 @@ const ExchangeAssetList = (
     footerSpacer,
   ]);
 
+  const genericAssets = useSelector(
+    ({ data: { genericAssets } }) => genericAssets
+  );
+
   const isFocused = useIsFocused();
 
-  const sections = useMemo(() => items.map(createItem), [createItem, items]);
+  const theme = useTheme();
+
+  const { nativeCurrency, nativeCurrencySymbol } = useAccountSettings();
+  const favoriteMap = useSelector(state => state.uniswap.favoritesMeta);
+  console.log(favoriteMap)
+
+  const enrichedItems = items.map(({ data, ...item }) => ({
+    ...item,
+    data: data.map(rowData => ({
+      ...rowData,
+      favorite: !!favoriteMap[rowData.address]?.favorite,
+      nativeCurrency,
+      nativeCurrencySymbol,
+      onPress: () => {
+        if (rowData.isVerified || itemProps.showBalance) {
+          itemProps.onPress(genericAssets[rowData.address]);
+        } else {
+          itemProps.onUnverifiedTokenPress(item);
+        }
+      },
+      showBalance: itemProps.showBalance,
+      showFavoriteButton: itemProps.showFavoriteButton,
+      theme,
+      toggleFavorite: () =>
+        dispatch(
+          uniswapUpdateFavorites(
+            rowData.address,
+            !favoriteMap[rowData.address]?.favorite
+          )
+        ),
+    })),
+  }));
+
+  const sections = useMemo(() => items.map(item => ({ ...item })), [items]);
 
   return (
     <Fragment>
@@ -259,7 +299,7 @@ const ExchangeAssetList = (
           renderItem={renderItem}
           renderSectionHeader={ExchangeAssetSectionListHeader}
           scrollsToTop={isFocused}
-          sections={sections}
+          sections={enrichedItems}
         />
       </View>
 
