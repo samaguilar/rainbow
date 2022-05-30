@@ -7,6 +7,7 @@ import React, {
   useContext,
   useImperativeHandle,
   useRef,
+  useState,
 } from 'react';
 import { Alert, Keyboard, SectionList, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -24,6 +25,7 @@ import { useTheme } from '@rainbow-me/context';
 import { TokenSectionTypes } from '@rainbow-me/helpers';
 import { usePrevious, useUniswapCurrencyList } from '@rainbow-me/hooks';
 import { useNavigation } from '@rainbow-me/navigation';
+import store from '@rainbow-me/redux/store';
 import { uniswapUpdateFavorites } from '@rainbow-me/redux/uniswap';
 import Routes from '@rainbow-me/routes';
 import styled from '@rainbow-me/styled-components';
@@ -257,15 +259,27 @@ const ExchangeAssetList = (
 
   const { nativeCurrency, nativeCurrencySymbol } = useAccountSettings();
   const favoriteMap = useSelector(state => state.uniswap.favoritesMeta);
-  console.log(favoriteMap)
+  const [localFavorite, setLocalFavorite] = useState(() => {
+    const meta = store.getState().uniswap.favoritesMeta;
+    if (!meta) {
+      return;
+    }
+    return Object.keys(meta).reduce((acc, curr) => {
+      acc[curr] = meta[curr].favorite;
+      return acc;
+    }, {});
+  });
+
+  console.log(localFavorite, favoriteMap);
 
   const enrichedItems = items.map(({ data, ...item }) => ({
     ...item,
     data: data.map(rowData => ({
       ...rowData,
-      favorite: !!favoriteMap[rowData.address]?.favorite,
+      favorite: !!localFavorite[rowData.address],
       nativeCurrency,
       nativeCurrencySymbol,
+      onCopySwapDetailsText,
       onPress: () => {
         if (rowData.isVerified || itemProps.showBalance) {
           itemProps.onPress(genericAssets[rowData.address]);
@@ -276,17 +290,18 @@ const ExchangeAssetList = (
       showBalance: itemProps.showBalance,
       showFavoriteButton: itemProps.showFavoriteButton,
       theme,
-      toggleFavorite: () =>
-        dispatch(
-          uniswapUpdateFavorites(
-            rowData.address,
-            !favoriteMap[rowData.address]?.favorite
-          )
-        ),
+      toggleFavorite: () => {
+        setLocalFavorite(prev => {
+          const newValue = !prev[rowData.address];
+          itemProps.onActionAsset(genericAssets[rowData.address], newValue);
+          return {
+            ...prev,
+            [rowData.address]: newValue,
+          };
+        });
+      },
     })),
   }));
-
-  const sections = useMemo(() => items.map(item => ({ ...item })), [items]);
 
   return (
     <Fragment>

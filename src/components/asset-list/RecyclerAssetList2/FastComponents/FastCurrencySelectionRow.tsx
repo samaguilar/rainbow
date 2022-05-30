@@ -6,6 +6,7 @@ import RadialGradient from 'react-native-radial-gradient';
 import useAccountSettings from '../../../../hooks/useAccountSettings';
 import { ButtonPressAnimation } from '../../../animations';
 import { CoinRowHeight } from '../../../coin-row';
+import CoinRowInfoButton from '../../../coin-row/CoinRowInfoButton';
 import FastCoinIcon from './FastCoinIcon';
 import { useTheme } from '@rainbow-me/context';
 import { Text } from '@rainbow-me/design-system';
@@ -31,22 +32,31 @@ const Circle = styled(
 });
 
 export default React.memo(function FastCurrencySelectionRow({
-  item: { uniqueId, showBalance, showFavoriteButton, onPress, theme, nativeCurrency, nativeCurrencySymbol, favorite, toggleFavorite },
+  item: {
+    uniqueId,
+    showBalance,
+    showFavoriteButton,
+    onPress,
+    theme,
+    nativeCurrency,
+    nativeCurrencySymbol,
+    favorite,
+    toggleFavorite,
+    onCopySwapDetailsText,
+  },
 }: {
   item: any;
 }) {
   // TODO
   const { isDarkMode } = theme;
 
-
   const item = useAccountAsset(uniqueId, nativeCurrency);
 
-
   if (!item) {
-    return null
+    return null;
   }
 
-  console.log({ favorite })
+  console.log({ favorite });
   return (
     <View style={{ flexDirection: 'row', width: '100%' }}>
       <ButtonPressAnimation
@@ -95,9 +105,13 @@ export default React.memo(function FastCurrencySelectionRow({
       </ButtonPressAnimation>
       {showFavoriteButton && (
         <View style={[cx.fav]}>
-          <ButtonPressAnimation
-            onPress={toggleFavorite}
-          >
+          {!item.isNativeAsset && !showBalance && (
+            <CoinRowInfoButton
+              item={item}
+              onCopySwapDetailsText={onCopySwapDetailsText}
+            />
+          )}
+          <ButtonPressAnimation onPress={toggleFavorite}>
             <RadialGradient
               center={[0, 15]}
               colors={[
@@ -114,24 +128,9 @@ export default React.memo(function FastCurrencySelectionRow({
                 width: 30,
               }}
             >
-              {favorite && <Text color={{ custom: colors.yellowFavorite }}>􀋃</Text>}
-            </RadialGradient>
-          </ButtonPressAnimation>
-          <ButtonPressAnimation>
-            <RadialGradient
-              center={[0, 15]}
-              colors={colors.gradients.lightestGrey}
-              style={{
-                alignItems: 'center',
-                borderRadius: 15,
-                height: 30,
-                justifyContent: 'center',
-                overflow: 'hidden',
-                paddingBottom: 3,
-                width: 30,
-              }}
-            >
-              <Text>􀅼</Text>
+              {favorite && (
+                <Text color={{ custom: colors.yellowFavorite }}>􀋃</Text>
+              )}
             </RadialGradient>
           </ButtonPressAnimation>
         </View>
