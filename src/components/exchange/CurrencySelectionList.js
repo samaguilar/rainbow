@@ -8,6 +8,7 @@ import { NoResults } from '../list';
 import { CurrencySelectModalHeaderHeight } from './CurrencySelectModalHeader';
 import ExchangeAssetList from './ExchangeAssetList';
 import { ExchangeSearchHeight } from './ExchangeSearch';
+import SearchAssetList from './SearchAssetList';
 import { usePrevious } from '@rainbow-me/hooks';
 import styled from '@rainbow-me/styled-components';
 import { position } from '@rainbow-me/styles';
@@ -41,9 +42,11 @@ const CurrencySelectionList = (
     query,
     showList,
     testID,
+    fromDiscover,
   },
   ref
 ) => {
+  const List = fromDiscover ? SearchAssetList : ExchangeAssetList;
   const skeletonTransitionRef = useRef();
   const noResults = get(listItems, '[0].data', []).length === 0;
   const showGhost = !loading && noResults;
@@ -68,7 +71,7 @@ const CurrencySelectionList = (
           {showGhost ? (
             <NoCurrencyResults />
           ) : (
-            <ExchangeAssetList
+            <List
               footerSpacer={footerSpacer}
               itemProps={itemProps}
               items={listItems}

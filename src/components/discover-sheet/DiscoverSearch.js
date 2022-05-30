@@ -167,6 +167,7 @@ export default function DiscoverSearch() {
           showList
           testID="discover-currency-select-list"
           type={CurrencySelectionTypes.output}
+          fromDiscover
         />
       </SearchContainer>
     </View>

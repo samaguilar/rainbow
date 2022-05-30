@@ -1,35 +1,28 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { IS_TESTING } from 'react-native-dotenv';
-import { BaseButton } from 'react-native-gesture-handler';
+import { Text as RNText, StyleSheet, View } from 'react-native';
+import {
+  // @ts-ignore
+  IS_TESTING,
+} from 'react-native-dotenv';
+// @ts-ignore
+import { ContextMenuButton } from 'react-native-ios-context-menu';
 import RadialGradient from 'react-native-radial-gradient';
-import useAccountSettings from '../../../../hooks/useAccountSettings';
 import { ButtonPressAnimation } from '../../../animations';
 import { CoinRowHeight } from '../../../coin-row';
-import CoinRowInfoButton from '../../../coin-row/CoinRowInfoButton';
 import FastCoinIcon from './FastCoinIcon';
-import { useTheme } from '@rainbow-me/context';
 import { Text } from '@rainbow-me/design-system';
 import { useAccountAsset } from '@rainbow-me/hooks';
-import styled from '@rainbow-me/styled-components';
-import { borders, colors, padding } from '@rainbow-me/styles';
+import {
+  borders,
+  colors,
+  fonts,
+  fontWithWidth,
+  padding,
+} from '@rainbow-me/styles';
 
-const Circle = styled(
-  IS_TESTING === 'true' ? RadialGradient : RadialGradient
-).attrs(({ isFavorited, theme: { colors, isDarkMode } }) => ({
-  center: [0, 15],
-  colors: isFavorited
-    ? [
-        colors.alpha('#FFB200', isDarkMode ? 0.15 : 0),
-        colors.alpha('#FFB200', isDarkMode ? 0.05 : 0.2),
-      ]
-    : colors.gradients.lightestGrey,
-}))({
-  borderRadius: 15,
-  height: 30,
-  overflow: 'hidden',
-  width: 30,
-});
+const SafeRadialGradient = (IS_TESTING === 'ftrue'
+  ? View
+  : RadialGradient) as typeof RadialGradient;
 
 export default React.memo(function FastCurrencySelectionRow({
   item: {
@@ -42,12 +35,11 @@ export default React.memo(function FastCurrencySelectionRow({
     nativeCurrencySymbol,
     favorite,
     toggleFavorite,
-    onCopySwapDetailsText,
+    contextMenuProps,
   },
 }: {
   item: any;
 }) {
-  // TODO
   const { isDarkMode } = theme;
 
   const item = useAccountAsset(uniqueId, nativeCurrency);
@@ -56,7 +48,6 @@ export default React.memo(function FastCurrencySelectionRow({
     return null;
   }
 
-  console.log({ favorite });
   return (
     <View style={{ flexDirection: 'row', width: '100%' }}>
       <ButtonPressAnimation
@@ -71,7 +62,7 @@ export default React.memo(function FastCurrencySelectionRow({
             symbol={item.symbol}
             theme={theme}
           />
-          <View style={[cx.innerContainer, { backgroundColor: 'blue' }]}>
+          <View style={cx.innerContainer}>
             <View style={[cx.column, cx.center]}>
               <Text align="left" numberOfLines={1} size="16px" weight="medium">
                 {item.name}
@@ -106,18 +97,56 @@ export default React.memo(function FastCurrencySelectionRow({
       {showFavoriteButton && (
         <View style={[cx.fav]}>
           {!item.isNativeAsset && !showBalance && (
-            <CoinRowInfoButton
-              item={item}
-              onCopySwapDetailsText={onCopySwapDetailsText}
-            />
+            <ContextMenuButton
+              activeOpacity={0}
+              isMenuPrimaryAction
+              useActionSheetFallback={false}
+              wrapNativeComponent={false}
+              {...contextMenuProps}
+            >
+              <ButtonPressAnimation>
+                <SafeRadialGradient
+                  center={[0, 15]}
+                  colors={colors.gradients.lightestGrey}
+                  style={{
+                    alignItems: 'center',
+                    borderRadius: 15,
+                    height: 30,
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    paddingBottom: 5,
+                    width: 30,
+                  }}
+                >
+                  <RNText
+                    style={{
+                      color: colors.alpha(colors.blueGreyDark, 0.3),
+                      fontSize: 16,
+                      letterSpacing: 0,
+                      textAlign: 'center',
+                      ...fontWithWidth(fonts.weight.bold),
+                      height: '100%',
+                      lineHeight: 30,
+                      width: '100%',
+                    }}
+                  >
+                    􀅳
+                  </RNText>
+                </SafeRadialGradient>
+              </ButtonPressAnimation>
+            </ContextMenuButton>
           )}
           <ButtonPressAnimation onPress={toggleFavorite}>
-            <RadialGradient
+            <SafeRadialGradient
               center={[0, 15]}
-              colors={[
-                colors.alpha('#FFB200', isDarkMode ? 0.15 : 0),
-                colors.alpha('#FFB200', isDarkMode ? 0.05 : 0.2),
-              ]}
+              colors={
+                favorite
+                  ? [
+                      colors.alpha('#FFB200', isDarkMode ? 0.15 : 0),
+                      colors.alpha('#FFB200', isDarkMode ? 0.05 : 0.2),
+                    ]
+                  : colors.gradients.lightestGrey
+              }
               style={{
                 alignItems: 'center',
                 borderRadius: 15,
@@ -128,10 +157,16 @@ export default React.memo(function FastCurrencySelectionRow({
                 width: 30,
               }}
             >
-              {favorite && (
-                <Text color={{ custom: colors.yellowFavorite }}>􀋃</Text>
-              )}
-            </RadialGradient>
+              <Text
+                color={{
+                  custom: favorite
+                    ? colors.yellowFavorite
+                    : colors.alpha(colors.blueGreyDark, 0.2),
+                }}
+              >
+                􀋃
+              </Text>
+            </SafeRadialGradient>
           </ButtonPressAnimation>
         </View>
       )}
