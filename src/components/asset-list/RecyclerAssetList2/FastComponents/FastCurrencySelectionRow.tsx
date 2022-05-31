@@ -53,6 +53,7 @@ export default React.memo(function FastCurrencySelectionRow({
     <View style={{ flexDirection: 'row', width: '100%' }}>
       <ButtonPressAnimation
         onPress={onPress}
+        style={{ flex: 1 }}
         wrapperStyle={{
           flex: 1,
         }}
@@ -255,6 +256,7 @@ const cx = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginLeft: 10,
+    width: '100%',
   },
   nonEditMode: {
     paddingHorizontal: 19,
