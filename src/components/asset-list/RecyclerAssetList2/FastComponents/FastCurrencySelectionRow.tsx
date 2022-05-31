@@ -19,8 +19,9 @@ import {
   fontWithWidth,
   padding,
 } from '@rainbow-me/styles';
+import { isETH } from '@rainbow-me/utils';
 
-const SafeRadialGradient = (IS_TESTING === 'ftrue'
+const SafeRadialGradient = (IS_TESTING === 'true'
   ? View
   : RadialGradient) as typeof RadialGradient;
 
@@ -63,27 +64,38 @@ export default React.memo(function FastCurrencySelectionRow({
             theme={theme}
           />
           <View style={cx.innerContainer}>
-            <View style={[cx.column, cx.center]}>
+            <View
+              style={[
+                cx.column,
+                {
+                  height: 33,
+                  justifyContent: showBalance ? 'center' : 'space-between',
+                },
+              ]}
+            >
               <Text align="left" numberOfLines={1} size="16px" weight="medium">
                 {item.name}
               </Text>
-              <Text
-                align="left"
-                color={{ custom: theme.colors.blueGreyDark50 }}
-                numberOfLines={1}
-                size="11px"
-                weight="medium"
-              >
-                {item.symbol}
-              </Text>
+              {!showBalance && (
+                <Text
+                  align="left"
+                  color={{ custom: theme.colors.blueGreyDark50 }}
+                  numberOfLines={1}
+                  size="14px"
+                  weight="medium"
+                >
+                  {item.symbol}
+                </Text>
+              )}
             </View>
             {showBalance && (
-              <View style={[cx.column]}>
-                <Text align="right" size="11px" weight="medium">
+              <View style={[cx.column, { height: 33 }]}>
+                <Text align="right" size="16px">
                   {item?.native?.balance?.display ??
                     `${nativeCurrencySymbol}0.00`}
                 </Text>
                 <Text
+                  align="right"
                   color={{ custom: theme.colors.blueGreyDark50 }}
                   size="14px"
                 >
@@ -96,7 +108,7 @@ export default React.memo(function FastCurrencySelectionRow({
       </ButtonPressAnimation>
       {showFavoriteButton && (
         <View style={[cx.fav]}>
-          {!item.isNativeAsset && !showBalance && (
+          {(!item.isNativeAsset || isETH(item.address)) && !showBalance && (
             <ContextMenuButton
               activeOpacity={0}
               isMenuPrimaryAction
@@ -230,7 +242,7 @@ const cx = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingRight: 20,
-    width: 80,
+    width: 92,
   },
   flex: {
     flex: 1,
