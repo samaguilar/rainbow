@@ -30,6 +30,7 @@ export default React.memo(function FastCurrencySelectionRow({
     uniqueId,
     showBalance,
     showFavoriteButton,
+    showAddButton,
     onPress,
     theme,
     nativeCurrency,
@@ -37,6 +38,9 @@ export default React.memo(function FastCurrencySelectionRow({
     favorite,
     toggleFavorite,
     contextMenuProps,
+    symbol,
+    address,
+    name,
   },
 }: {
   item: any;
@@ -44,10 +48,6 @@ export default React.memo(function FastCurrencySelectionRow({
   const { isDarkMode } = theme;
 
   const item = useAccountAsset(uniqueId, nativeCurrency);
-
-  if (!item) {
-    return null;
-  }
 
   return (
     <View style={{ flexDirection: 'row', width: '100%' }}>
@@ -60,8 +60,8 @@ export default React.memo(function FastCurrencySelectionRow({
       >
         <View style={[cx.rootContainer, { flex: 1, width: '100%' }]}>
           <FastCoinIcon
-            address={item.mainnet_address || item.address}
-            symbol={item.symbol}
+            address={item?.mainnet_address || item?.address || address}
+            symbol={item?.symbol || symbol}
             theme={theme}
           />
           <View style={cx.innerContainer}>
@@ -75,7 +75,7 @@ export default React.memo(function FastCurrencySelectionRow({
               ]}
             >
               <Text align="left" numberOfLines={1} size="16px" weight="medium">
-                {item.name}
+                {item?.name || name}
               </Text>
               {!showBalance && (
                 <Text
@@ -85,7 +85,7 @@ export default React.memo(function FastCurrencySelectionRow({
                   size="14px"
                   weight="medium"
                 >
-                  {item.symbol}
+                  {item?.symbol || symbol}
                 </Text>
               )}
             </View>
@@ -107,9 +107,9 @@ export default React.memo(function FastCurrencySelectionRow({
           </View>
         </View>
       </ButtonPressAnimation>
-      {showFavoriteButton && (
+      {!showBalance && (
         <View style={[cx.fav]}>
-          {(!item.isNativeAsset || isETH(item.address)) && !showBalance && (
+          {(!item?.isNativeAsset || isETH(item?.address)) && !showBalance && (
             <ContextMenuButton
               activeOpacity={0}
               isMenuPrimaryAction
@@ -149,38 +149,67 @@ export default React.memo(function FastCurrencySelectionRow({
               </ButtonPressAnimation>
             </ContextMenuButton>
           )}
-          <ButtonPressAnimation onPress={toggleFavorite}>
-            <SafeRadialGradient
-              center={[0, 15]}
-              colors={
-                favorite
-                  ? [
-                      colors.alpha('#FFB200', isDarkMode ? 0.15 : 0),
-                      colors.alpha('#FFB200', isDarkMode ? 0.05 : 0.2),
-                    ]
-                  : colors.gradients.lightestGrey
-              }
-              style={{
-                alignItems: 'center',
-                borderRadius: 15,
-                height: 30,
-                justifyContent: 'center',
-                overflow: 'hidden',
-                paddingBottom: 5,
-                width: 30,
-              }}
-            >
-              <Text
-                color={{
-                  custom: favorite
-                    ? colors.yellowFavorite
-                    : colors.alpha(colors.blueGreyDark, 0.2),
+          {showFavoriteButton && (
+            <ButtonPressAnimation onPress={toggleFavorite}>
+              <SafeRadialGradient
+                center={[0, 15]}
+                colors={
+                  favorite
+                    ? [
+                        colors.alpha('#FFB200', isDarkMode ? 0.15 : 0),
+                        colors.alpha('#FFB200', isDarkMode ? 0.05 : 0.2),
+                      ]
+                    : colors.gradients.lightestGrey
+                }
+                style={{
+                  alignItems: 'center',
+                  borderRadius: 15,
+                  height: 30,
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  paddingBottom: 5,
+                  width: 30,
                 }}
               >
-                􀋃
-              </Text>
-            </SafeRadialGradient>
-          </ButtonPressAnimation>
+                <Text
+                  color={{
+                    custom: favorite
+                      ? colors.yellowFavorite
+                      : colors.alpha(colors.blueGreyDark, 0.2),
+                  }}
+                >
+                  􀋃
+                </Text>
+              </SafeRadialGradient>
+            </ButtonPressAnimation>
+          )}
+          {showAddButton && (
+            <ButtonPressAnimation onPress={toggleFavorite}>
+              <SafeRadialGradient
+                center={[0, 15]}
+                colors={colors.gradients.lightestGrey}
+                style={{
+                  alignItems: 'center',
+                  borderRadius: 15,
+                  height: 30,
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  paddingBottom: 5,
+                  width: 30,
+                }}
+              >
+                <Text
+                  color={{
+                    custom: colors.alpha(colors.blueGreyDark, 0.3),
+                  }}
+                  size="16px"
+                  weight="bold"
+                >
+                  +
+                </Text>
+              </SafeRadialGradient>
+            </ButtonPressAnimation>
+          )}
         </View>
       )}
     </View>

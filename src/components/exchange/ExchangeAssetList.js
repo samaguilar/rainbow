@@ -1,47 +1,36 @@
 import { useIsFocused } from '@react-navigation/native';
 import lang from 'i18n-js';
-import { startCase } from 'lodash';
 import React, {
   forwardRef,
   Fragment,
   useCallback,
   useContext,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
 import { Alert, Keyboard, SectionList, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import RadialGradient from 'react-native-radial-gradient';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { ButtonPressAnimation } from '../../components/animations';
-import { accountAssetsDataSelector } from '../../hooks/useAccountAsset';
 import useAccountSettings from '../../hooks/useAccountSettings';
-import { setClipboard } from '../../hooks/useClipboard';
 import FastCurrencySelectionRow from '../asset-list/RecyclerAssetList2/FastComponents/FastCurrencySelectionRow';
-import { CoinRowHeight, ExchangeCoinRow } from '../coin-row';
+import { CoinRowHeight } from '../coin-row';
 import { ContactRow } from '../contacts';
 import DiscoverSheetContext from '../discover-sheet/DiscoverSheetContext';
 import { GradientText, Text } from '../text';
 import { CopyToast, ToastPositionContainer } from '../toasts';
+import contextMenuProps from './exchangeAssetRowContextMenuProps';
 import { useTheme } from '@rainbow-me/context';
 import { TokenSectionTypes } from '@rainbow-me/helpers';
-import { usePrevious, useUniswapCurrencyList } from '@rainbow-me/hooks';
+import { usePrevious } from '@rainbow-me/hooks';
 import { useNavigation } from '@rainbow-me/navigation';
 import store from '@rainbow-me/redux/store';
-import { uniswapUpdateFavorites } from '@rainbow-me/redux/uniswap';
 import Routes from '@rainbow-me/routes';
 import styled from '@rainbow-me/styled-components';
 import { padding } from '@rainbow-me/styles';
-import {
-  abbreviations,
-  deviceUtils,
-  ethereumUtils,
-  haptics,
-  magicMemo,
-  showActionSheetWithOptions,
-} from '@rainbow-me/utils';
-import contextMenuProps from "./exchangeAssetRowContextMenuProps";
+import { abbreviations, deviceUtils, magicMemo } from '@rainbow-me/utils';
 
 const deviceWidth = deviceUtils.dimensions.width;
 
@@ -81,8 +70,9 @@ const HeaderTitleGradient = styled(GradientText).attrs({
 const HeaderTitleWrapper = styled.View({});
 
 const contentContainerStyle = { paddingBottom: 9.5 };
-const keyExtractor = ({ uniqueId }) => `ExchangeAssetList-${uniqueId}`;
 const scrollIndicatorInsets = { bottom: 24 };
+const keyExtractor = ({ uniqueId }) => `ExchangeAssetList-${uniqueId}`;
+
 const getItemLayout = ({ showBalance }, index) => {
   const height = showBalance ? CoinRowHeight + 1 : CoinRowHeight;
   return {
@@ -91,7 +81,6 @@ const getItemLayout = ({ showBalance }, index) => {
     offset: height * index,
   };
 };
-
 
 function useSwapDetailsClipboardState() {
   const [copiedText, setCopiedText] = useState(undefined);
@@ -113,20 +102,31 @@ const Spacer = styled.View({
 });
 
 const ExchangeAssetSectionList = styled(SectionList).attrs({
-  // alwaysBounceVertical: true,
-  // contentContainerStyle,
-  // directionalLockEnabled: true,
+  alwaysBounceVertical: true,
+  contentContainerStyle,
+  directionalLockEnabled: true,
   getItemLayout,
-  // initialNumToRender: 10,
-  // keyboardShouldPersistTaps: 'always',
-  // keyExtractor,
-  // scrollIndicatorInsets,
-  windowSize: 7,
+  keyboardShouldPersistTaps: 'always',
+  keyExtractor,
+  scrollIndicatorInsets,
 })({
   height: '100%',
 });
 
 function renderItem({ item }) {
+  if (item.ens) {
+    return (
+      <ContactRow
+        accountType="contact"
+        address={item.address}
+        color={item.color}
+        nickname={item.nickname}
+        onPress={item.onPress}
+        showcaseItem={item}
+        testID={item.testID}
+      />
+    );
+  }
   return <FastCurrencySelectionRow item={item} />;
 }
 
@@ -163,12 +163,6 @@ const ExchangeAssetList = (
       viewPosition: 0,
     });
   }
-
-  const createItem = useCallback(item => Object.assign(item, itemProps), [
-    itemProps,
-  ]);
-
-  const dispatch = useDispatch();
 
   const handleUnverifiedTokenPress = useCallback(
     item => {
@@ -218,45 +212,6 @@ const ExchangeAssetList = (
     ) : null;
   };
 
-  // either show ENS row or Currency row
-  const LineToRender = useCallback(
-    ({ item }) => {
-      return item.ens ? (
-        <ContactRow
-          accountType="contact"
-          address={item.address}
-          color={item.color}
-          nickname={item.nickname}
-          onPress={itemProps.onPress}
-          showcaseItem={item}
-          testID={testID}
-        />
-      ) : (
-        <ExchangeCoinRow
-          {...itemProps}
-          isVerified={item.isVerified}
-          item={item}
-          onCopySwapDetailsText={onCopySwapDetailsText}
-          onUnverifiedTokenPress={handleUnverifiedTokenPress}
-          testID={testID}
-        />
-      );
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onCopySwapDetailsText]
-  );
-  const renderItemCallback = useCallback(
-    ({ item, index, section }) =>
-      console.log(item.name) || (
-        // in the Discover screen search results, we mix in ENS rows with coin rows
-        <LineToRender
-          item={item}
-          key={`${item.address}_${index}_${section.key}`}
-        />
-      ),
-    []
-  );
-
   const FooterSpacer = useCallback(() => (footerSpacer ? <Spacer /> : null), [
     footerSpacer,
   ]);
@@ -270,7 +225,6 @@ const ExchangeAssetList = (
   const theme = useTheme();
 
   const { nativeCurrency, nativeCurrencySymbol } = useAccountSettings();
-  const favoriteMap = useSelector(state => state.uniswap.favoritesMeta);
   const [localFavorite, setLocalFavorite] = useState(() => {
     const meta = store.getState().uniswap.favoritesMeta;
     if (!meta) {
@@ -282,42 +236,60 @@ const ExchangeAssetList = (
     }, {});
   });
 
-  console.log(localFavorite, favoriteMap);
-
-  const enrichedItems = items.map(({ data, ...item }) => ({
-    ...item,
-    data: data.map(rowData => ({
-      ...rowData,
-      contextMenuProps: contextMenuProps(
-        genericAssets[rowData.address],
-        onCopySwapDetailsText
-      ),
-      favorite: !!localFavorite[rowData.address],
+  const enrichedItems = useMemo(
+    () =>
+      items.map(({ data, ...item }) => ({
+        ...item,
+        data: data.map(rowData => ({
+          ...rowData,
+          contextMenuProps: contextMenuProps(
+            genericAssets[rowData.address],
+            onCopySwapDetailsText
+          ),
+          favorite: !!localFavorite[rowData.address],
+          nativeCurrency,
+          nativeCurrencySymbol,
+          onCopySwapDetailsText,
+          onPress: item => {
+            if (rowData.ens) {
+              return itemProps.onPress(item);
+            }
+            if (rowData.isVerified || itemProps.showBalance) {
+              itemProps.onPress(genericAssets[rowData.address]);
+            } else {
+              handleUnverifiedTokenPress(item);
+            }
+          },
+          showAddButton: itemProps.showAddButton,
+          showBalance: itemProps.showBalance,
+          showFavoriteButton: itemProps.showFavoriteButton,
+          testID,
+          theme,
+          toggleFavorite: () => {
+            setLocalFavorite(prev => {
+              const newValue = !prev[rowData.address];
+              itemProps.onActionAsset(genericAssets[rowData.address], newValue);
+              return {
+                ...prev,
+                [rowData.address]: newValue,
+              };
+            });
+          },
+        })),
+      })),
+    [
+      genericAssets,
+      handleUnverifiedTokenPress,
+      itemProps,
+      items,
+      localFavorite,
       nativeCurrency,
       nativeCurrencySymbol,
       onCopySwapDetailsText,
-      onPress: () => {
-        if (rowData.isVerified || itemProps.showBalance) {
-          itemProps.onPress(genericAssets[rowData.address]);
-        } else {
-          itemProps.onUnverifiedTokenPress(item);
-        }
-      },
-      showBalance: itemProps.showBalance,
-      showFavoriteButton: itemProps.showFavoriteButton,
+      testID,
       theme,
-      toggleFavorite: () => {
-        setLocalFavorite(prev => {
-          const newValue = !prev[rowData.address];
-          itemProps.onActionAsset(genericAssets[rowData.address], newValue);
-          return {
-            ...prev,
-            [rowData.address]: newValue,
-          };
-        });
-      },
-    })),
-  }));
+    ]
+  );
 
   return (
     <Fragment>
