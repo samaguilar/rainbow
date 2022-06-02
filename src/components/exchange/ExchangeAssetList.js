@@ -115,6 +115,7 @@ const ExchangeAssetSectionList = styled(SectionList).attrs({
 
 function renderItem({ item }) {
   if (item.ens) {
+    // TODO
     return (
       <ContactRow
         accountType="contact"

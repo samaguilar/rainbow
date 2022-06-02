@@ -47,6 +47,7 @@ export default React.memo(function FastCurrencySelectionRow({
 }) {
   const { isDarkMode } = theme;
 
+  // TODO
   const item = useAccountAsset(uniqueId, nativeCurrency);
 
   return (
