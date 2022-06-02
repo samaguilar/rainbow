@@ -66,7 +66,7 @@ export default function DiscoverSearch() {
 
   const handlePress = useCallback(
     item => {
-      if (item.ens) {
+      if (item?.ens) {
         // navigate to Showcase sheet
         searchInputRef?.current?.blur();
         InteractionManager.runAfterInteractions(() => {
