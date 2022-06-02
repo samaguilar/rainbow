@@ -110,7 +110,6 @@ const ExchangeAssetSectionList = styled(SectionList).attrs({
   scrollIndicatorInsets,
   windowSize: 7,
 })({
-  borderWidth: 3,
   height: '100%',
 });
 
