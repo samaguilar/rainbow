@@ -12,7 +12,6 @@ import React, {
 } from 'react';
 import { Alert, Keyboard, SectionList, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { useSelector } from 'react-redux';
 import { ButtonPressAnimation } from '../../components/animations';
 import useAccountSettings from '../../hooks/useAccountSettings';
 import FastCurrencySelectionRow from '../asset-list/RecyclerAssetList2/FastComponents/FastCurrencySelectionRow';
@@ -109,7 +108,9 @@ const ExchangeAssetSectionList = styled(SectionList).attrs({
   keyboardShouldPersistTaps: 'always',
   keyExtractor,
   scrollIndicatorInsets,
+  windowSize: 7,
 })({
+  borderWidth: 3,
   height: '100%',
 });
 
@@ -217,10 +218,6 @@ const ExchangeAssetList = (
     footerSpacer,
   ]);
 
-  const genericAssets = useSelector(
-    ({ data: { genericAssets } }) => genericAssets
-  );
-
   const isFocused = useIsFocused();
 
   const theme = useTheme();
@@ -244,7 +241,7 @@ const ExchangeAssetList = (
         data: data.map(rowData => ({
           ...rowData,
           contextMenuProps: contextMenuProps(
-            genericAssets[rowData.address],
+            store.getState().data.genericAssets?.[rowData.address],
             onCopySwapDetailsText
           ),
           favorite: !!localFavorite[rowData.address],
@@ -255,12 +252,13 @@ const ExchangeAssetList = (
             if (rowData.ens) {
               return itemProps.onPress(givenItem);
             }
+            const asset = store.getState().data.genericAssets?.[
+              rowData.address
+            ];
             if (rowData.isVerified || itemProps.showBalance) {
-              itemProps.onPress(genericAssets[rowData.address] || rowData);
+              itemProps.onPress(asset || rowData);
             } else {
-              handleUnverifiedTokenPress(
-                genericAssets[rowData.address] || rowData
-              );
+              handleUnverifiedTokenPress(asset || rowData);
             }
           },
           showAddButton: itemProps.showAddButton,
@@ -271,7 +269,11 @@ const ExchangeAssetList = (
           toggleFavorite: () => {
             setLocalFavorite(prev => {
               const newValue = !prev[rowData.address];
-              itemProps.onActionAsset(genericAssets[rowData.address], newValue);
+              itemProps.onActionAsset(
+                store.getState().data.genericAssets?.[rowData.address] ||
+                  rowData,
+                newValue
+              );
               return {
                 ...prev,
                 [rowData.address]: newValue,
@@ -281,7 +283,6 @@ const ExchangeAssetList = (
         })),
       })),
     [
-      genericAssets,
       handleUnverifiedTokenPress,
       itemProps,
       items,
