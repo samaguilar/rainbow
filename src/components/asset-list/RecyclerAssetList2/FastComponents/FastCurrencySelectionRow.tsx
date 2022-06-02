@@ -7,18 +7,13 @@ import {
 // @ts-ignore
 import { ContextMenuButton } from 'react-native-ios-context-menu';
 import RadialGradient from 'react-native-radial-gradient';
+import fonts from '../../../../styles/fonts';
 import { ButtonPressAnimation } from '../../../animations';
 import { CoinRowHeight } from '../../../coin-row';
 import FastCoinIcon from './FastCoinIcon';
 import { Text } from '@rainbow-me/design-system';
 import { useAccountAsset } from '@rainbow-me/hooks';
-import {
-  borders,
-  colors,
-  fonts,
-  fontWithWidth,
-  padding,
-} from '@rainbow-me/styles';
+import { borders, colors, fontWithWidth, padding } from '@rainbow-me/styles';
 import { isETH } from '@rainbow-me/utils';
 
 const SafeRadialGradient = (IS_TESTING === 'true'
@@ -51,15 +46,13 @@ export default React.memo(function FastCurrencySelectionRow({
   const item = useAccountAsset(uniqueId, nativeCurrency);
 
   return (
-    <View style={{ flexDirection: 'row', width: '100%' }}>
+    <View style={cx.row}>
       <ButtonPressAnimation
         onPress={onPress}
-        style={{ flex: 1 }}
-        wrapperStyle={{
-          flex: 1,
-        }}
+        style={cx.flex}
+        wrapperStyle={cx.flex}
       >
-        <View style={[cx.rootContainer, { flex: 1, width: '100%' }]}>
+        <View style={cx.rootContainer}>
           <FastCoinIcon
             address={item?.mainnet_address || item?.address || address}
             symbol={item?.symbol || symbol}
@@ -70,7 +63,6 @@ export default React.memo(function FastCurrencySelectionRow({
               style={[
                 cx.column,
                 {
-                  height: 33,
                   justifyContent: showBalance ? 'center' : 'space-between',
                 },
               ]}
@@ -122,30 +114,14 @@ export default React.memo(function FastCurrencySelectionRow({
                 <SafeRadialGradient
                   center={[0, 15]}
                   colors={colors.gradients.lightestGrey}
-                  style={{
-                    alignItems: 'center',
-                    borderRadius: 15,
-                    height: 30,
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    paddingBottom: 5,
-                    width: 30,
-                  }}
+                  style={cx.gradient}
                 >
-                  <RNText
-                    style={{
-                      color: colors.alpha(colors.blueGreyDark, 0.3),
-                      fontSize: 16,
-                      letterSpacing: 0,
-                      textAlign: 'center',
-                      ...fontWithWidth(fonts.weight.bold),
-                      height: '100%',
-                      lineHeight: 30,
-                      width: '100%',
-                    }}
+                  <Text
+                    color={{ custom: colors.alpha(colors.blueGreyDark, 0.3) }}
+                    weight="bold"
                   >
                     􀅳
-                  </RNText>
+                  </Text>
                 </SafeRadialGradient>
               </ButtonPressAnimation>
             </ContextMenuButton>
@@ -162,15 +138,7 @@ export default React.memo(function FastCurrencySelectionRow({
                       ]
                     : colors.gradients.lightestGrey
                 }
-                style={{
-                  alignItems: 'center',
-                  borderRadius: 15,
-                  height: 30,
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                  paddingBottom: 5,
-                  width: 30,
-                }}
+                style={[cx.gradient, cx.starGradient]}
               >
                 <Text
                   color={{
@@ -189,25 +157,9 @@ export default React.memo(function FastCurrencySelectionRow({
               <SafeRadialGradient
                 center={[0, 15]}
                 colors={colors.gradients.lightestGrey}
-                style={{
-                  alignItems: 'center',
-                  borderRadius: 15,
-                  height: 30,
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                  paddingBottom: 5,
-                  width: 30,
-                }}
+                style={[cx.gradient, cx.addGradient]}
               >
-                <Text
-                  color={{
-                    custom: colors.alpha(colors.blueGreyDark, 0.3),
-                  }}
-                  size="16px"
-                  weight="bold"
-                >
-                  +
-                </Text>
+                <RNText style={cx.addText}>+</RNText>
               </SafeRadialGradient>
             </ButtonPressAnimation>
           )}
@@ -218,6 +170,20 @@ export default React.memo(function FastCurrencySelectionRow({
 });
 
 const cx = StyleSheet.create({
+  addGradient: {
+    paddingBottom: 3,
+    paddingLeft: 1,
+  },
+  addText: {
+    color: colors.alpha(colors.blueGreyDark, 0.3),
+    fontSize: 26,
+    letterSpacing: 0,
+    textAlign: 'center',
+    ...fontWithWidth(fonts.weight.medium),
+    height: 30,
+    lineHeight: 30,
+    width: '100%',
+  },
   bottom: {
     marginTop: 12,
   },
@@ -260,6 +226,7 @@ const cx = StyleSheet.create({
   },
   column: {
     flexDirection: 'column',
+    height: 33,
     justifyContent: 'space-between',
   },
   container: {
@@ -277,6 +244,14 @@ const cx = StyleSheet.create({
   },
   flex: {
     flex: 1,
+  },
+  gradient: {
+    alignItems: 'center',
+    borderRadius: 15,
+    height: 30,
+    justifyContent: 'center',
+    overflow: 'hidden',
+    width: 30,
   },
   hiddenRow: {
     opacity: 0.4,
@@ -297,5 +272,13 @@ const cx = StyleSheet.create({
     flexDirection: 'row',
     height: CoinRowHeight,
     paddingHorizontal: 19,
+    width: '100%',
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  starGradient: {
+    paddingBottom: ios ? 1 : 5,
+    paddingLeft: ios ? 1 : 0,
   },
 });
