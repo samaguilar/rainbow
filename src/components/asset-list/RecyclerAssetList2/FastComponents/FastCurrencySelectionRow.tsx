@@ -36,6 +36,7 @@ export default React.memo(function FastCurrencySelectionRow({
     symbol,
     address,
     name,
+    testID,
   },
 }: {
   item: any;
@@ -45,11 +46,14 @@ export default React.memo(function FastCurrencySelectionRow({
   // TODO
   const item = useAccountAsset(uniqueId, nativeCurrency);
 
+  const rowTestID = testID + '-exchange-coin-row-' + (item?.symbol || symbol);
+
   return (
     <View style={cx.row}>
       <ButtonPressAnimation
         onPress={onPress}
         style={cx.flex}
+        testID={rowTestID}
         wrapperStyle={cx.flex}
       >
         <View style={cx.rootContainer}>
