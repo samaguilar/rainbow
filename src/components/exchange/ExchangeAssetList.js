@@ -251,14 +251,16 @@ const ExchangeAssetList = (
           nativeCurrency,
           nativeCurrencySymbol,
           onCopySwapDetailsText,
-          onPress: item => {
+          onPress: givenItem => {
             if (rowData.ens) {
-              return itemProps.onPress(item);
+              return itemProps.onPress(givenItem);
             }
             if (rowData.isVerified || itemProps.showBalance) {
-              itemProps.onPress(genericAssets[rowData.address]);
+              itemProps.onPress(genericAssets[rowData.address] || rowData);
             } else {
-              handleUnverifiedTokenPress(item);
+              handleUnverifiedTokenPress(
+                genericAssets[rowData.address] || rowData
+              );
             }
           },
           showAddButton: itemProps.showAddButton,
