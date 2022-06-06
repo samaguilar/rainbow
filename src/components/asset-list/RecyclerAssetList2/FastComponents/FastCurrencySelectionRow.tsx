@@ -43,7 +43,7 @@ export default React.memo(function FastCurrencySelectionRow({
 }) {
   const { isDarkMode } = theme;
 
-  // TODO
+  // TODO https://github.com/rainbow-me/rainbow/pull/3313/files#r876259954
   const item = useAccountAsset(uniqueId, nativeCurrency);
 
   const rowTestID = testID + '-exchange-coin-row-' + (item?.symbol || symbol);

@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Alert, Keyboard, SectionList, View } from 'react-native';
+import { Alert, Keyboard, SectionList, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { ButtonPressAnimation } from '../../components/animations';
 import useAccountSettings from '../../hooks/useAccountSettings';
@@ -115,7 +115,7 @@ const ExchangeAssetSectionList = styled(SectionList).attrs({
 
 function renderItem({ item }) {
   if (item.ens) {
-    // TODO
+    // TODO RNBW-3676
     return (
       <ContactRow
         accountType="contact"
@@ -296,7 +296,7 @@ const ExchangeAssetList = (
 
   return (
     <Fragment>
-      <View style={{ height: '100%', width: '100%' }}>
+      <View style={cx.wrapper}>
         <ExchangeAssetSectionList
           ListFooterComponent={FooterSpacer}
           keyboardDismissMode={keyboardDismissMode}
@@ -315,5 +315,9 @@ const ExchangeAssetList = (
     </Fragment>
   );
 };
+
+const cx = StyleSheet.create({
+  wrapper: { height: '100%', width: '100%' },
+});
 
 export default magicMemo(forwardRef(ExchangeAssetList), ['items', 'query']);
