@@ -61,7 +61,6 @@ const CoinCheckButton = React.memo(function CoinCheckButton({
 
           {coinIconPlaceholder && (
             <CoinIconIndicator
-              // @ts-expect-error
               isPinned={isPinned}
               style={cx.coinIconIndicator}
               theme={theme}
@@ -152,17 +151,19 @@ const MemoizedBalanceCoinRow = React.memo(
 
             <View style={[cx.innerContainer, isHidden && cx.hiddenRow]}>
               <View style={cx.row}>
-                <Text
-                  align="right"
-                  numberOfLines={1}
-                  size="16px"
-                  weight="medium"
-                >
-                  {item.name}
-                </Text>
+                <View style={cx.textWrapper}>
+                  <Text
+                    align="left"
+                    numberOfLines={1}
+                    size="16px"
+                    weight="medium"
+                  >
+                    {item.name}
+                  </Text>
+                </View>
 
                 <Text
-                  align="right"
+                  align="left"
                   color={{ custom: valueColor }}
                   size="16px"
                   weight="medium"
@@ -173,12 +174,16 @@ const MemoizedBalanceCoinRow = React.memo(
               </View>
 
               <View style={[cx.row, cx.bottom]}>
-                <Text
-                  color={{ custom: theme.colors.blueGreyDark50 }}
-                  size="14px"
-                >
-                  {nativeDisplay ?? ''}
-                </Text>
+                <View style={cx.textWrapper}>
+                  <Text
+                    align="left"
+                    color={{ custom: theme.colors.blueGreyDark50 }}
+                    numberOfLines={1}
+                    size="14px"
+                  >
+                    {nativeDisplay ?? ''}
+                  </Text>
+                </View>
 
                 <Text color={{ custom: changeColor }} size="14px">
                   {percentageChangeDisplay}
@@ -221,9 +226,8 @@ export default React.memo(function BalanceCoinRow({
   const maybeCallback = useRef<null | (() => void)>(null);
   maybeCallback.current = isCoinListEdited ? onPress : null;
 
-  // we return false to make sure we don't run includes for each row when it's not needed
-  const isHidden = isCoinListEdited ? hiddenCoins[uniqueId] : false;
-  const isPinned = isCoinListEdited ? pinnedCoins[uniqueId] : false;
+  const isHidden = hiddenCoins[uniqueId];
+  const isPinned = pinnedCoins[uniqueId];
 
   return (
     <View style={[cx.rootContainer, !isCoinListEdited && cx.nonEditMode]}>
@@ -252,9 +256,11 @@ export default React.memo(function BalanceCoinRow({
 
 const cx = StyleSheet.create({
   bottom: {
-    marginTop: 12,
+    marginTop: 11.5,
   },
   checkboxContainer: {
+    alignSelf: 'center',
+    marginRight: -4,
     width: 51,
   },
   checkboxInnerContainer: {
@@ -278,21 +284,15 @@ const cx = StyleSheet.create({
     left: 19,
     position: 'absolute',
   },
-  coinIconFallback: {
-    backgroundColor: '#25292E',
-    borderRadius: 20,
-    height: 40,
-    width: 40,
-  },
   coinIconIndicator: {
     left: 19,
     position: 'absolute',
   },
   container: {
     flexDirection: 'row',
-    marginLeft: 2,
-    marginRight: 19,
-    marginVertical: 9.5,
+    marginRight: 18,
+    overflow: 'visible',
+    paddingLeft: 9,
   },
   flex: {
     flex: 1,
@@ -302,19 +302,24 @@ const cx = StyleSheet.create({
   },
   innerContainer: {
     flex: 1,
-    justifyContent: 'center',
     marginLeft: 10,
+    paddingTop: 14.5,
   },
   nonEditMode: {
-    paddingLeft: 19,
+    paddingLeft: 10,
   },
   rootContainer: {
-    alignItems: 'center',
     flex: 1,
     flexDirection: 'row',
+    marginTop: -1,
+    overflow: 'visible',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  textWrapper: {
+    flex: 1,
+    paddingRight: 20,
   },
 });

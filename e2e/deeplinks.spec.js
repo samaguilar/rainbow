@@ -44,7 +44,6 @@ describe('Deeplinks spec', () => {
 
   it('Should navigate to the Wallet screen after tapping on "Import Wallet"', async () => {
     await Helpers.disableSynchronization();
-    await Helpers.checkIfVisible('wallet-info-input');
     await Helpers.waitAndTap('wallet-info-submit-button');
     if (device.getPlatform() === 'android') {
       await Helpers.checkIfVisible('pin-authentication-screen');
@@ -55,11 +54,9 @@ describe('Deeplinks spec', () => {
     }
     await Helpers.checkIfVisible('wallet-screen', 40000);
     await Helpers.enableSynchronization();
-    // Waiting 10s for MATIC assets to show up
-    await Helpers.delay(20000);
   });
 
-  it('should be able to handle ethereum payments urls for ETH (mainnet)', async () => {
+  xit('should be able to handle ethereum payments urls for ETH (mainnet)', async () => {
     const url = 'ethereum:payment-brunobarbieri.eth@1?value=1e15';
     await testEthereumDeeplink(url);
   });
@@ -74,7 +71,7 @@ describe('Deeplinks spec', () => {
     await testEthereumDeeplink(url);
   });
 
-  it('should be able to handle ethereum payments urls for DAI (mainnet)', async () => {
+  xit('should be able to handle ethereum payments urls for DAI (mainnet)', async () => {
     const url =
       'ethereum:0x6b175474e89094c44da98b954eedeac495271d0f@1/transfer?address=brunobarbieri.eth&uint256=1e18';
     await testEthereumDeeplink(url);
