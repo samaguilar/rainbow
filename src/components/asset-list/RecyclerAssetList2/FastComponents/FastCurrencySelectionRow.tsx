@@ -83,7 +83,7 @@ export default React.memo(function FastCurrencySelectionRow({
                   ...fontWithWidth(fonts.weight.regular),
                 }}
               >
-                {item?.name || name + 'X'}
+                {item?.name || name}
               </RNText>
               {!showBalance && (
                 <>
@@ -136,7 +136,10 @@ export default React.memo(function FastCurrencySelectionRow({
                 <SafeRadialGradient
                   center={[0, 15]}
                   colors={colors.gradients.lightestGrey}
-                  style={[cx.gradient, { paddingLeft: 2.5, paddingBottom: 2.5 }]}
+                  style={[
+                    cx.gradient,
+                    { paddingBottom: 2.5, paddingLeft: 2.5 },
+                  ]}
                 >
                   <Text
                     color={{ custom: colors.alpha(colors.blueGreyDark, 0.3) }}
@@ -162,15 +165,19 @@ export default React.memo(function FastCurrencySelectionRow({
                 }
                 style={[cx.gradient, cx.starGradient]}
               >
-                <Text
-                  color={{
-                    custom: favorite
+                <RNText
+                  ellipsizeMode="tail"
+                  numberOfLines={1}
+                  style={{
+                    color: favorite
                       ? colors.yellowFavorite
                       : colors.alpha(colors.blueGreyDark, 0.2),
+                    fontSize: 13,
+                    ...fontWithWidth(fonts.weight.regular),
                   }}
                 >
                   􀋃
-                </Text>
+                </RNText>
               </SafeRadialGradient>
             </ButtonPressAnimation>
           )}
@@ -272,8 +279,9 @@ const cx = StyleSheet.create({
     borderRadius: 15,
     height: 30,
     justifyContent: 'center',
+    marginHorizontal: 2,
     overflow: 'hidden',
-    width: 34,
+    width: 30,
   },
   hiddenRow: {
     opacity: 0.4,
@@ -302,5 +310,7 @@ const cx = StyleSheet.create({
   starGradient: {
     paddingBottom: ios ? 1 : 5,
     paddingLeft: ios ? 1 : 0,
+    paddingTop: 3,
+    width: 30,
   },
 });
