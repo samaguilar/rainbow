@@ -10,7 +10,6 @@ import RadialGradient from 'react-native-radial-gradient';
 import fonts, { getFontSize } from '../../../../styles/fonts';
 import { ButtonPressAnimation } from '../../../animations';
 import { CoinRowHeight } from '../../../coin-row';
-import CoinName from '../../../coin-row/CoinName';
 import FastCoinIcon from './FastCoinIcon';
 import { Text } from '@rainbow-me/design-system';
 import { useAccountAsset } from '@rainbow-me/hooks';
@@ -75,13 +74,7 @@ export default React.memo(function FastCurrencySelectionRow({
               <RNText
                 ellipsizeMode="tail"
                 numberOfLines={1}
-                style={{
-                  color: colors.dark,
-                  fontSize: getFontSize(fonts.size.lmedium),
-                  letterSpacing: 0.5,
-                  lineHeight: showBalance ? 18.5 : ios ? 16 : 17,
-                  ...fontWithWidth(fonts.weight.regular),
-                }}
+                style={[cx.name, showBalance && cx.nameWithBalances]}
               >
                 {item?.name || name}
               </RNText>
@@ -136,14 +129,7 @@ export default React.memo(function FastCurrencySelectionRow({
                 <SafeRadialGradient
                   center={[0, 15]}
                   colors={colors.gradients.lightestGrey}
-                  style={[
-                    cx.gradient,
-                    {
-                      paddingBottom: ios ? 0 : 2.5,
-                      paddingLeft: 2.5,
-                      paddingTop: ios ? 1 : 0,
-                    },
-                  ]}
+                  style={[cx.gradient, cx.igradient]}
                 >
                   <Text
                     color={{ custom: colors.alpha(colors.blueGreyDark, 0.3) }}
@@ -172,13 +158,7 @@ export default React.memo(function FastCurrencySelectionRow({
                 <RNText
                   ellipsizeMode="tail"
                   numberOfLines={1}
-                  style={{
-                    color: favorite
-                      ? colors.yellowFavorite
-                      : colors.alpha(colors.blueGreyDark, 0.2),
-                    fontSize: 13,
-                    ...fontWithWidth(fonts.weight.regular),
-                  }}
+                  style={[cx.star, favorite && cx.starFavorite]}
                 >
                   􀋃
                 </RNText>
@@ -290,12 +270,27 @@ const cx = StyleSheet.create({
   hiddenRow: {
     opacity: 0.4,
   },
+  igradient: {
+    paddingBottom: ios ? 0 : 2.5,
+    paddingLeft: 2.5,
+    paddingTop: ios ? 1 : 0,
+  },
   innerContainer: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginLeft: 10,
     width: '100%',
+  },
+  name: {
+    color: colors.dark,
+    fontSize: getFontSize(fonts.size.lmedium),
+    letterSpacing: 0.5,
+    lineHeight: ios ? 16 : 17,
+    ...fontWithWidth(fonts.weight.regular),
+  },
+  nameWithBalances: {
+    lineHeight: 18.5,
   },
   nonEditMode: {
     paddingHorizontal: 19,
@@ -310,6 +305,14 @@ const cx = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+  },
+  star: {
+    color: colors.alpha(colors.blueGreyDark, 0.2),
+    fontSize: 13,
+    ...fontWithWidth(fonts.weight.regular),
+  },
+  starFavorite: {
+    color: colors.yellowFavorite,
   },
   starGradient: {
     paddingBottom: ios ? 3 : 5,
