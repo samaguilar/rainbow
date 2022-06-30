@@ -7,13 +7,19 @@ import {
 // @ts-ignore
 import { ContextMenuButton } from 'react-native-ios-context-menu';
 import RadialGradient from 'react-native-radial-gradient';
-import fonts, { getFontSize } from '../../../../styles/fonts';
 import { ButtonPressAnimation } from '../../../animations';
 import { CoinRowHeight } from '../../../coin-row';
 import FastCoinIcon from './FastCoinIcon';
 import { Text } from '@rainbow-me/design-system';
 import { useAccountAsset } from '@rainbow-me/hooks';
-import { borders, colors, fontWithWidth, padding } from '@rainbow-me/styles';
+import {
+  borders,
+  colors,
+  fonts,
+  fontWithWidth,
+  getFontSize,
+  padding,
+} from '@rainbow-me/styles';
 import { isETH } from '@rainbow-me/utils';
 
 const SafeRadialGradient = (IS_TESTING === 'true'
