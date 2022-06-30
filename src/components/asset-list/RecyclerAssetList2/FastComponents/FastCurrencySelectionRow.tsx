@@ -79,7 +79,7 @@ export default React.memo(function FastCurrencySelectionRow({
                   color: colors.dark,
                   fontSize: getFontSize(fonts.size.lmedium),
                   letterSpacing: 0.5,
-                  lineHeight: showBalance ? 18.5 : 17,
+                  lineHeight: showBalance ? 18.5 : ios ? 16 : 17,
                   ...fontWithWidth(fonts.weight.regular),
                 }}
               >
@@ -94,7 +94,7 @@ export default React.memo(function FastCurrencySelectionRow({
                       color: theme.colors.blueGreyDark50,
                       fontSize: getFontSize(fonts.size.smedium),
                       letterSpacing: 0.5,
-                      lineHeight: 16,
+                      lineHeight: ios ? 13.5 : 16,
                       paddingTop: 5.5,
                       ...fontWithWidth(fonts.weight.regular),
                     }}
@@ -138,7 +138,11 @@ export default React.memo(function FastCurrencySelectionRow({
                   colors={colors.gradients.lightestGrey}
                   style={[
                     cx.gradient,
-                    { paddingBottom: 2.5, paddingLeft: 2.5 },
+                    {
+                      paddingBottom: ios ? 0 : 2.5,
+                      paddingLeft: 2.5,
+                      paddingTop: ios ? 1 : 0,
+                    },
                   ]}
                 >
                   <Text
