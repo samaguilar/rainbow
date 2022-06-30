@@ -312,7 +312,7 @@ const cx = StyleSheet.create({
     flexDirection: 'row',
   },
   starGradient: {
-    paddingBottom: ios ? 1 : 5,
+    paddingBottom: ios ? 3 : 5,
     paddingLeft: ios ? 1 : 0,
     paddingTop: 3,
     width: 30,
