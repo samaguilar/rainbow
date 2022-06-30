@@ -7,9 +7,10 @@ import {
 // @ts-ignore
 import { ContextMenuButton } from 'react-native-ios-context-menu';
 import RadialGradient from 'react-native-radial-gradient';
-import fonts from '../../../../styles/fonts';
+import fonts, { getFontSize } from '../../../../styles/fonts';
 import { ButtonPressAnimation } from '../../../animations';
 import { CoinRowHeight } from '../../../coin-row';
+import CoinName from '../../../coin-row/CoinName';
 import FastCoinIcon from './FastCoinIcon';
 import { Text } from '@rainbow-me/design-system';
 import { useAccountAsset } from '@rainbow-me/hooks';
@@ -71,19 +72,36 @@ export default React.memo(function FastCurrencySelectionRow({
                 },
               ]}
             >
-              <Text align="left" numberOfLines={1} size="16px" weight="medium">
-                {item?.name || name}
-              </Text>
+              <RNText
+                ellipsizeMode="tail"
+                numberOfLines={1}
+                style={{
+                  color: colors.dark,
+                  fontSize: getFontSize(fonts.size.lmedium),
+                  letterSpacing: 0.5,
+                  lineHeight: 17,
+                  ...fontWithWidth(fonts.weight.regular),
+                }}
+              >
+                {item?.name || name + 'X'}
+              </RNText>
               {!showBalance && (
-                <Text
-                  align="left"
-                  color={{ custom: theme.colors.blueGreyDark50 }}
-                  numberOfLines={1}
-                  size="14px"
-                  weight="medium"
-                >
-                  {item?.symbol || symbol}
-                </Text>
+                <>
+                  <RNText
+                    ellipsizeMode="tail"
+                    numberOfLines={1}
+                    style={{
+                      color: theme.colors.blueGreyDark50,
+                      fontSize: getFontSize(fonts.size.smedium),
+                      letterSpacing: 0.5,
+                      lineHeight: 16,
+                      paddingTop: 5.5,
+                      ...fontWithWidth(fonts.weight.regular),
+                    }}
+                  >
+                    {item?.symbol || symbol}
+                  </RNText>
+                </>
               )}
             </View>
             {showBalance && (
@@ -118,7 +136,7 @@ export default React.memo(function FastCurrencySelectionRow({
                 <SafeRadialGradient
                   center={[0, 15]}
                   colors={colors.gradients.lightestGrey}
-                  style={cx.gradient}
+                  style={[cx.gradient, { paddingLeft: 2.5, paddingBottom: 2.5 }]}
                 >
                   <Text
                     color={{ custom: colors.alpha(colors.blueGreyDark, 0.3) }}
@@ -184,7 +202,7 @@ const cx = StyleSheet.create({
     letterSpacing: 0,
     textAlign: 'center',
     ...fontWithWidth(fonts.weight.medium),
-    height: 30,
+    height: 31,
     lineHeight: 30,
     width: '100%',
   },
@@ -243,7 +261,7 @@ const cx = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingRight: 20,
+    paddingRight: 17.5,
     width: 92,
   },
   flex: {
@@ -255,7 +273,7 @@ const cx = StyleSheet.create({
     height: 30,
     justifyContent: 'center',
     overflow: 'hidden',
-    width: 30,
+    width: 34,
   },
   hiddenRow: {
     opacity: 0.4,
