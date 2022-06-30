@@ -79,7 +79,7 @@ export default React.memo(function FastCurrencySelectionRow({
                   color: colors.dark,
                   fontSize: getFontSize(fonts.size.lmedium),
                   letterSpacing: 0.5,
-                  lineHeight: 17,
+                  lineHeight: showBalance ? 18.5 : 17,
                   ...fontWithWidth(fonts.weight.regular),
                 }}
               >
@@ -105,7 +105,7 @@ export default React.memo(function FastCurrencySelectionRow({
               )}
             </View>
             {showBalance && (
-              <View style={[cx.column, { height: 33 }]}>
+              <View style={[cx.column, { height: 34 }]}>
                 <Text align="right" size="16px">
                   {item?.native?.balance?.display ??
                     `${nativeCurrencySymbol}0.00`}
