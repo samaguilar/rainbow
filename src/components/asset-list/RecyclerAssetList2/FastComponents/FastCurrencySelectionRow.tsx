@@ -89,14 +89,12 @@ export default React.memo(function FastCurrencySelectionRow({
                   <RNText
                     ellipsizeMode="tail"
                     numberOfLines={1}
-                    style={{
-                      color: theme.colors.blueGreyDark50,
-                      fontSize: getFontSize(fonts.size.smedium),
-                      letterSpacing: 0.5,
-                      lineHeight: ios ? 13.5 : 16,
-                      paddingTop: 5.5,
-                      ...fontWithWidth(fonts.weight.regular),
-                    }}
+                    style={[
+                      cx.symbol,
+                      {
+                        color: theme.colors.blueGreyDark50,
+                      },
+                    ]}
                   >
                     {item?.symbol || symbol}
                   </RNText>
@@ -325,5 +323,12 @@ const cx = StyleSheet.create({
     paddingLeft: ios ? 1 : 0,
     paddingTop: 3,
     width: 30,
+  },
+  symbol: {
+    fontSize: getFontSize(fonts.size.smedium),
+    letterSpacing: 0.5,
+    lineHeight: ios ? 13.5 : 16,
+    paddingTop: 5.5,
+    ...fontWithWidth(fonts.weight.regular),
   },
 });
